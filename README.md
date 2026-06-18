@@ -1,6 +1,9 @@
 # Bank Loan Analysis 📊
 
 This project is a data analysis of bank loan data using Python. It explores loan distribution, repayment behavior, and key financial patterns across different states, purposes, and time periods.
+The dataset and problem statements are provided by:
+https://www.youtube.com/@datatutorials1. Thank you very much! I really
+appreciate it
 
 ## 📌 Project Goals
 
