@@ -68,7 +68,7 @@ def map_ordinal(df, col_name: str) -> pd.DataFrame:
 ## Now we remove the features which are unrelated or indirectly reveals the targets
 ## The columns are: 'id', 'application_type', 'emp_title', 'last_credit_pull_date', 'last_payment_date', 'issue_date', 'next_payment_date', 'total_payment', 'member_id
 def remove_unrelated_columns(df, columns: list[str]) -> pd.DataFrame:
-  df = df.drop(columns=columns, axis=1)
+  df = df.drop(columns=columns)
   return df
 
 ## We do one-hot encoding for categorical columns
