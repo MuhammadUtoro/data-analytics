@@ -76,3 +76,24 @@ def test_ordinal_mapping_emp_length():
   ## Assert
   expected_values = [0, 2, 3, 4, 10, 5]
   assert df["emp_length"].tolist() == expected_values
+
+## Test remove unrelated_features
+def test_remove_unrelated_colummns():
+  ## Arrange
+  test_data = pd.DataFrame({
+    "id": [1, 2, 3, 4, 5, 6],
+    "grade": ["A", "A", "C", "D", "E", "B"],
+    "application_type": ["test01", "test02", "test03", "test04", "test05", "test06"],
+    "emp_title": ["title_test01", "title_test02", "title_test03", "title_test04", "title_test05", "title_test06"],
+    "sub_grade": ["A1", "D2", "C3", "B5", "E1", "F2"],
+    "emp_length": ["< 1 year", "2 years", "3 years", "4 years", "10+ years", "5 years"],
+    "loan_status": ["Current", "Fully Paid", "Current", "Charged Off", "Fully Paid", "Charged Off"]
+  })
+
+  drop_cols = ["id", "application_type", "emp_title"]
+
+  ## Act
+  df = remove_unrelated_columns(test_data, columns=drop_cols)
+
+  ## Assert
+  assert set(drop_cols).isdisjoint(df.columns)
