@@ -20,7 +20,7 @@ def test_extract_excel(tmp_path):
   )
 
   ## Act
-  df = extract_excel(filepath / filename)
+  df = extract_excel(filepath, filename)
 
   ## Assert
   assert isinstance(df, pd.DataFrame)
@@ -45,7 +45,7 @@ def test_extract_shape(tmp_path):
   )
 
   ## Act
-  df = extract_excel(filepath / filename)
+  df = extract_excel(filepath, filename)
 
   ## Assert
   assert df.shape == test_data.shape
