@@ -29,3 +29,12 @@ base_pipeline = Pipeline([
 ## Fit the model
 base_pipeline.fit(X_train, y_train)
 # %%
+## Predict and find the score
+y_pred = base_pipeline.predict(X_test)
+base_pipeline.score(X_test, y_test)
+# %%
+## Evaluate the model
+from sklearn.metrics import classification_report, confusion_matrix, roc_auc_score
+print(confusion_matrix(y_test, y_pred))
+print(classification_report(y_test, y_pred))
+# %%
