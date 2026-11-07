@@ -30,11 +30,70 @@ base_pipeline = Pipeline([
 base_pipeline.fit(X_train, y_train)
 # %%
 ## Predict and find the score
-y_pred = base_pipeline.predict(X_test)
+y_pred_base = base_pipeline.predict(X_test)
 base_pipeline.score(X_test, y_test)
 # %%
 ## Evaluate the model
 from sklearn.metrics import classification_report, confusion_matrix, roc_auc_score
-print(confusion_matrix(y_test, y_pred))
-print(classification_report(y_test, y_pred))
+confuse_mat_base = confusion_matrix(y_test, y_pred_base)
+class_report_base = classification_report(y_test, y_pred_base, output_dict=True)
+# %%
+## Now we do Hyperparameter tuning using GridSearchCV
+from sklearn.model_selection import GridSearchCV
+grid_search = [
+  {"log_reg__class_weight": ["balanced"], "log_reg__solver": ["lbfgs"], "log_reg__C": [10, 100], "log_reg__max_iter": [100, 1000]},
+]
+
+scoring = {
+  "recall": "recall",
+  "precision": "precision",
+  "f1": "f1",
+  "accuracy": "accuracy"
+}
+
+gridCV = GridSearchCV(
+  estimator=base_pipeline,
+  param_grid=grid_search,
+  scoring=scoring,
+  refit="recall",
+  cv=3,
+  return_train_score=True,
+  n_jobs=-1
+)
+
+# %%
+## Fit the model
+gridCV.fit(X_train, y_train)
+# %%
+## Find the best estimator
+gridCV.best_estimator_
+# %%
+print(gridCV.best_params_)
+print(gridCV.best_score_)
+# %%
+## Use the best model to predict
+y_pred_best = gridCV.best_estimator_.predict(X_test)
+# %%
+confuse_mat_best = confusion_matrix(y_test, y_pred_best)
+class_report_best = classification_report(y_test, y_pred_best, output_dict=True)
+# %%
+## Visualise the comparison between parameters
+## Best model
+class_report_matrix_best = pd.DataFrame(class_report_best).T
+class_report_matrix_best = class_report_matrix_best.loc[["0","1"], ["precision", "recall", "f1-score"]]
+class_report_matrix_best
+# %%
+## Base model
+class_report_matrix_base = pd.DataFrame(class_report_base).T
+class_report_matrix_base = class_report_matrix_base.loc[["0", "1"], ["precision", "recall", "f1-score"]]
+class_report_matrix_base
+# %%
+## Compare
+print("Baseline Model Classification Report")
+print("-------------------------------------")
+print(class_report_matrix_base)
+# %%
+print("Best Model (after tuning) Classification Report")
+print("-------------------------------------")
+print(class_report_matrix_best)
 # %%
