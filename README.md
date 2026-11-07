@@ -46,6 +46,35 @@ The project includes:
 
 ---
 
+## 🔍 Key Findings
+
+The exploratory data analysis and initial Machine Learning experiments revealed several interesting insights:
+
+### 📊 Exploratory Data Analysis
+
+- **Loan Distribution:** Identified the states with the highest loan volumes and explored geographical patterns in lending activity.
+- **Loan Purposes:** Analyzed the distribution of loans across different purposes to understand the primary reasons borrowers seek financial assistance.
+- **Financial Comparison:** Examined the relationship between the total amount of money disbursed and the amount received through repayments.
+- **Monthly Trends:** Explored changes in loan activity over time to identify potential seasonal patterns and trends.
+
+### 🤖 Machine Learning
+
+- **Class Imbalance:** The dataset contains considerably more Fully Paid loans than Charged Off loans, making classification more challenging.
+- **Logistic Regression:** Achieved relatively balanced recall across both classes, identifying approximately 63% of Charged Off loans and 64% of Fully Paid loans.
+- **Random Forest:** Achieved approximately 94% recall for Fully Paid loans but only 34.3% for Charged Off loans.
+- **Hyperparameter Tuning:** Initial GridSearchCV experiments did not produce significant improvements over the baseline models.
+- **Model Evaluation:** Accuracy alone was insufficient to assess model performance, highlighting the importance of precision, recall, F1-score, and confusion matrix analysis.
+
+### 💡 Main Takeaway
+
+The exploratory analysis provided insights into loan distribution and repayment behavior, while the Machine Learning experiments highlighted the challenges of predicting loan defaults in an imbalanced dataset.
+
+One of the main challenges identified so far is improving the model's ability to recognize Charged Off loans without generating an excessive number of false positive predictions.
+
+Further experimentation with feature engineering, class imbalance handling, classification thresholds, and additional algorithms may help improve the predictive performance.
+
+---
+
 # 🤖 Machine Learning – Loan Status Prediction
 
 ## 🎯 Objective
