@@ -71,3 +71,154 @@ print(
 )
 # %%
 ## Seventh Task: Calculate total money received and spent from each bad and good loan
+## Create function to calculate the parameters
+def loanMetrics(df: pd.DataFrame, cat: str):
+  total_spent_in_mil = df["loan_amount"].sum()/1000000
+  total_received_in_mil = df["total_payment"].sum()/1000000
+  profit = total_received_in_mil - total_spent_in_mil
+  print(
+    f"Total spent ({cat}) loan: ${total_spent_in_mil:.2f}M\nTotal received ({cat}) loan: ${total_received_in_mil:.2f}M\nTotal profit ({cat}): ${profit:.2f}M"
+  )
+# %%
+good_loans_metric = loanMetrics(df_good_loans, "good")
+bad_loans_metric = loanMetrics(df_bad_loans, "bad")
+total_metric = loanMetrics(df_all_time, "total")
+# %%
+## Visualisations Part
+## First task: Monthly trend graph
+import matplotlib.dates as mdates
+def plotRunningTotal(df):
+  monthly_traffic = df.sort_values("issue_date").groupby(pd.Grouper(key="issue_date", freq="ME"))[["loan_amount", "total_payment"]].sum().div(1000000).reset_index()
+  plt.figure(figsize=(10, 8))
+  plt.plot(
+    monthly_traffic["issue_date"],
+    monthly_traffic["loan_amount"],
+    color="red",
+    label="amount spent",
+    linewidth=2
+  )
+  plt.plot(
+    monthly_traffic["issue_date"],
+    monthly_traffic["total_payment"],
+    color="blue",
+    label="amount received",
+    linewidth=2
+  )
+  ## Add mark above the line
+  for i, row in monthly_traffic.iterrows():
+    plt.text(
+      row["issue_date"], row["loan_amount"], f"{row["loan_amount"]:.2f}",
+      ha="center", va="bottom", color="red"
+    )
+  for i, row in monthly_traffic.iterrows():
+    plt.text(
+      row["issue_date"], row["total_payment"], f"{row["total_payment"]:.2f}",
+      ha="center", va="bottom", color="blue"
+    )
+  plt.title('Monthly Money Spent')
+  plt.xlabel('Month')
+  plt.ylabel('Money Spent in Millions')
+  plt.xticks(rotation=45)
+  plt.grid(True)
+  plt.legend()
+  plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%b %Y'))
+  plt.show()
+# %%
+plotRunningTotal(df_all_time)
+# %%
+## Monthly trend analysis
+trend_count = df_all_time.groupby(df_all_time['issue_date'].dt.strftime('%b %Y'))['id'].count().sort_index()
+
+# %%
+fig, ax = plt.subplots()
+
+line = ax.plot(
+    trend_count.index,
+    trend_count.values,
+    marker='o'
+)
+for x, y in zip(trend_count.index, trend_count.values):
+    ax.text(x, y, str(y))
+ax.set_title('Monthly Loan Trends')
+ax.set_ylabel('Loan count')
+plt.show()
+
+# %%
+## Third task: Regional analysis
+# First, we calculate the amount spent (loan_amount per state)
+total_running_per_state = df_all_time.groupby('address_state')[['loan_amount', 'total_payment']].sum().div(1000000).reset_index()
+top_5_state = total_running_per_state.sort_values(['loan_amount', 'total_payment'], ascending=False).head(5)
+top_5_state = top_5_state.rename(
+    columns={
+        'address_state': 'State',
+        'loan_amount': 'Money Spent',
+        'total_payment': 'Money Received'
+    }
+)
+print(top_5_state)
+# %%
+# Then we plot using bar char for comparison
+x = np.arange(len(top_5_state['State']))
+width = 0.4
+plt.figure(figsize=(8,5))
+# Add label on the top of the bar
+bars1 = plt.bar(x - width/2, top_5_state['Money Spent'], width, label='Money Spent')
+bars2 = plt.bar(x + width/2, top_5_state['Money Received'], width, label='Money Received' )
+plt.bar_label(bars1, fmt='$%.1fM')
+plt.bar_label(bars2, fmt='$%.1fM')
+plt.xticks(x, top_5_state['State'], rotation=45)
+plt.legend()
+plt.title('Top 5 States with Highest Loan Amount')
+plt.ylabel('Total Amount (Millions)')
+plt.show()
+# %%
+## Extended task: Comparing top 5 states with the whole country
+states = top_5_state['State'].tolist()
+values_spent = top_5_state['Money Spent'].tolist()
+values_received = top_5_state['Money Received'].tolist()
+
+others_spent = (
+    total_running_per_state['loan_amount'].sum() - sum(values_spent)
+)
+others_received = (
+    total_running_per_state['total_payment'].sum() - sum(values_received)
+)
+states.append('Others')
+values_spent.append(others_spent)
+values_received.append(others_received)
+
+# Plot
+fig, axes = plt.subplots(
+    1,2,figsize=(12, 6)
+)
+axes[0].pie(
+    values_spent,
+    labels=states,
+    autopct='%.1f%%'
+)
+axes[0].set_title('Percentage of Loan Amount')
+
+axes[1].pie(
+    values_received,
+    labels=states,
+    autopct='%.1f%%'
+)
+axes[1].set_title('Percentage of Total Payment')
+plt.show()
+# %%
+## Extended task: Loan purpose
+
+
+loan_purpose_count = df_all_time.groupby('purpose', sort=False).count()['id'].sort_values(ascending=False).reset_index(name='purpose_count')
+loan_purpose_count
+
+fig, ax = plt.subplots()
+bars = ax.barh(
+    loan_purpose_count['purpose'],
+    loan_purpose_count['purpose_count']
+)
+ax.bar_label(bars, fmt='%.0f')
+ax.set_title('Loan Purpose Breakdown')
+plt.show()
+
+# %%
